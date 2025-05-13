@@ -1,0 +1,98 @@
+﻿<Window x:Class="PN532NfcReader.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:local="clr-namespace:PN532NfcReader.ViewModels"
+        xmlns:prism="http://prismlibrary.com/"
+        prism:ViewModelLocator.AutoWireViewModel="True"
+        Title="{Binding Title}" Height="500" Width="1200"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <local:RadioButtonConverter x:Key="EnumConverter" />
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="500"/>
+        </Grid.ColumnDefinitions>
+
+        <ListBox Name="itemListBox" ItemsSource="{Binding LogItems}" Grid.Column="0">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Timestamp}" Margin="3"/>
+                            <Border Width="1" Margin="1"/>
+                            <TextBlock Text="{Binding Content}" Margin="3"/>
+                        </StackPanel>
+                        <Border BorderBrush="LightGray" BorderThickness="0,0,0,1"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <StackPanel Grid.Column="1">
+            <WrapPanel Margin="0 0 0 0 ">
+                <Button Content="ログクリア" Command="{Binding LogClearButton}" Width="100" />
+            </WrapPanel>
+            <!-- シリアル通信 -->
+            <Label Content="■ シリアル通信" Margin="0 0 0 1"></Label>
+            <WrapPanel Margin="22 0 0 0 ">
+                <Button Content="シリアル通信開始" Command="{Binding SerialStartButton}"/>
+                <Border Width="10" Height="Auto"/>
+                <Button Content="シリアル通信終了" Command="{Binding SerialStopButton}"/>
+                <Border Width="20" Height="Auto"/>
+                <Label Content="COMPORT:"></Label>
+                <ComboBox ItemsSource="{Binding SerialPortList}"
+                      SelectedValuePath="Value"
+                      DisplayMemberPath="DisplayValue"
+                      Width="150"
+                      Margin="0">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <prism:InvokeCommandAction
+                            Command="{Binding PortListSelectionChanged}"
+                            TriggerParameterPath="AddedItems"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ComboBox>
+            </WrapPanel>
+            <!-- 認証要求 -->
+            <Label Content="■ 設定参照" Margin="0 0 0 1"></Label>
+            <WrapPanel Margin="22 0 0 0 ">
+                <Button Content="全設定問い合わせ" Command="{Binding ZenSetteiToiawaseButton}"/>
+                <Border Width="20" Height="Auto"/>
+            </WrapPanel>
+            <Label Content="■ 設定変更" Margin="0 0 0 1"></Label>
+            <WrapPanel Margin="22 0 0 0 ">
+                <Label Content="◆ REG02(Air Data Rate,SF(拡散率),BW(帯域率) 設定変更" Margin="0 0 0 1"></Label>
+                <ComboBox ItemsSource="{Binding Combo1List}"
+                  SelectedItem="{Binding SelectedCombo1}"
+                  DisplayMemberPath="Display"
+                  Width="450"
+                  Height="Auto"
+                  Margin="0 0 0 2"/>
+                <Button Content="REG02 送信"
+                Command="{Binding SendReg02WriteCommandButton}"
+                Width="100" HorizontalAlignment="Left"/>
+            </WrapPanel>
+            <WrapPanel Margin="22 0 0 0 ">
+                <StackPanel>
+                    <Label Content="◆ REG04(channel) 設定変更" Margin="0 0 0 1"></Label>
+                    <WrapPanel Margin="0 0 0 0">
+                        <TextBlock Text="CH:" Margin="0 0 5 0"> </TextBlock>
+                        <TextBox Width="50" Text="{Binding InputChannelText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Right" MaxLength="2" Margin="0 0 5 0" />
+                        <Button Content="REG04 送信" Command="{Binding SendReg04WriteCommandButton}" />
+                    </WrapPanel>
+                </StackPanel>
+            </WrapPanel>
+            <Label Content="■ データ送信" Margin="0 0 0 1"></Label>
+            <WrapPanel Margin="22 0 0 0">
+                <TextBlock Text="ﾃﾞｰﾀ:" Margin="0 0 5 0"></TextBlock>
+                <TextBox Width="200" Text="{Binding InputDataText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Left"  Margin="0 0 5 0" />
+                <Button Content="ﾃﾞｰﾀ送信" Command="{Binding SendDataWriteCommandButton}" />
+            </WrapPanel>
+            <Button Content="ﾀﾞﾐｰ" Width="50" Margin=" 0 20 0 0" Command="{Binding DummyButton}" />
+            <ContentControl prism:RegionManager.RegionName="ContentRegion" />
+        </StackPanel>
+    </Grid>
+</Window>
